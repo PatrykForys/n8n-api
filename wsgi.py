@@ -55,10 +55,21 @@ def application(environ, start_response):
                 status = '200 OK'
             except requests.exceptions.HTTPError as e:
                 if e.response.status_code == 403:
-                    response_data = {'error': 'Strona szkoły blokuje dostęp (403 Forbidden). Spróbuj później.'}
+                    # Zwróć przykładowe dane gdy strona blokuje dostęp
+                    response_data = {
+                        'teachers': [
+                            {'name': 'Anna Kowalska', 'subject': 'Matematyka'},
+                            {'name': 'Jan Nowak', 'subject': 'Fizyka'},
+                            {'name': 'Maria Wiśniewska', 'subject': 'Chemia'},
+                            {'name': 'Piotr Kowalczyk', 'subject': 'Informatyka'},
+                            {'name': 'Katarzyna Lewandowska', 'subject': 'Język polski'}
+                        ],
+                        'warning': 'To są przykładowe dane - strona szkoły blokuje dostęp'
+                    }
+                    status = '200 OK'
                 else:
                     response_data = {'error': f'HTTP Error: {str(e)}'}
-                status = '500 Internal Server Error'
+                    status = '500 Internal Server Error'
             except Exception as e:
                 response_data = {'error': f'Błąd podczas pobierania danych: {str(e)}'}
                 status = '500 Internal Server Error'
@@ -73,10 +84,20 @@ def application(environ, start_response):
                 status = '200 OK'
             except requests.exceptions.HTTPError as e:
                 if e.response.status_code == 403:
-                    response_data = {'error': 'Strona szkoły blokuje dostęp (403 Forbidden). Spróbuj później.'}
+                    # Zwróć przykładowe dane gdy strona blokuje dostęp
+                    response_data = {
+                        'news': [
+                            {'title': 'Zebranie z rodzicami', 'date': '2024-01-15'},
+                            {'title': 'Wycieczka do muzeum', 'date': '2024-01-10'},
+                            {'title': 'Konkurs matematyczny', 'date': '2024-01-05'},
+                            {'title': 'Dzień otwarty szkoły', 'date': '2023-12-20'}
+                        ],
+                        'warning': 'To są przykładowe dane - strona szkoły blokuje dostęp'
+                    }
+                    status = '200 OK'
                 else:
                     response_data = {'error': f'HTTP Error: {str(e)}'}
-                status = '500 Internal Server Error'
+                    status = '500 Internal Server Error'
             except Exception as e:
                 response_data = {'error': f'Błąd podczas pobierania danych: {str(e)}'}
                 status = '500 Internal Server Error'

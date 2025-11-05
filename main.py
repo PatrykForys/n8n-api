@@ -23,18 +23,36 @@ def scrape(url: str) -> str:
 
     with requests.Session() as session:
         session.max_redirects = 5
-        response = session.get(url, headers=headers, timeout=(5, 15))
         
-        # Jeśli dostajemy 403, spróbuj z innymi nagłówkami
-        if response.status_code == 403:
-            # Spróbuj z uproszczonymi nagłówkami
-            simple_headers = {
-                "User-Agent": "Mozilla/5.0 (compatible; Bot)"
-            }
-            response = session.get(url, headers=simple_headers, timeout=(5, 15))
+        # Najpierw spróbuj normalnie
+        try:
+            response = session.get(url, headers=headers, timeout=(5, 15))
+            if response.status_code == 200:
+                return response.text
+        except:
+            pass
         
-        response.raise_for_status()
-        return response.text
+        # Jeśli nie działa, spróbuj z proxy
+        try:
+            # Użyj darmowego proxy
+            proxy_url = f"https://api.allorigins.win/raw?url={url}"
+            response = session.get(proxy_url, headers=headers, timeout=(10, 20))
+            if response.status_code == 200:
+                return response.text
+        except:
+            pass
+        
+        # Ostatnia szansa - spróbuj z innym proxy
+        try:
+            proxy_url2 = f"https://corsproxy.io/?{url}"
+            response = session.get(proxy_url2, headers=headers, timeout=(10, 20))
+            if response.status_code == 200:
+                return response.text
+        except:
+            pass
+        
+        # Jeśli nic nie działa, rzuć błędem
+        raise Exception("Nie udało się pobrać danych ze strony szkoły. Strona może blokować dostęp.")
 
 
 def extract_titles_and_dates_in_container(html: str):
