@@ -12,12 +12,27 @@ def scrape(url: str) -> str:
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/120.0 Safari/537.36"
-        )
+        ),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Accept-Encoding": "gzip, deflate, br",
+        "DNT": "1",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1"
     }
 
     with requests.Session() as session:
         session.max_redirects = 5
         response = session.get(url, headers=headers, timeout=(5, 15))
+        
+        # Jeśli dostajemy 403, spróbuj z innymi nagłówkami
+        if response.status_code == 403:
+            # Spróbuj z uproszczonymi nagłówkami
+            simple_headers = {
+                "User-Agent": "Mozilla/5.0 (compatible; Bot)"
+            }
+            response = session.get(url, headers=simple_headers, timeout=(5, 15))
+        
         response.raise_for_status()
         return response.text
 

@@ -14,6 +14,7 @@ from main import app
 
 # Simple WSGI wrapper using a more reliable approach
 import json
+import requests
 from urllib.parse import parse_qs
 
 def application(environ, start_response):
@@ -52,8 +53,14 @@ def application(environ, start_response):
                 teachers = extract_teacher_names(html)
                 response_data = {'teachers': teachers}
                 status = '200 OK'
+            except requests.exceptions.HTTPError as e:
+                if e.response.status_code == 403:
+                    response_data = {'error': 'Strona szkoły blokuje dostęp (403 Forbidden). Spróbuj później.'}
+                else:
+                    response_data = {'error': f'HTTP Error: {str(e)}'}
+                status = '500 Internal Server Error'
             except Exception as e:
-                response_data = {'error': str(e)}
+                response_data = {'error': f'Błąd podczas pobierania danych: {str(e)}'}
                 status = '500 Internal Server Error'
         elif path == '/akutalnosci':
             # Import the actual function from main
@@ -64,8 +71,14 @@ def application(environ, start_response):
                 news = extract_titles_and_dates_in_container(html)
                 response_data = {'news': news}
                 status = '200 OK'
+            except requests.exceptions.HTTPError as e:
+                if e.response.status_code == 403:
+                    response_data = {'error': 'Strona szkoły blokuje dostęp (403 Forbidden). Spróbuj później.'}
+                else:
+                    response_data = {'error': f'HTTP Error: {str(e)}'}
+                status = '500 Internal Server Error'
             except Exception as e:
-                response_data = {'error': str(e)}
+                response_data = {'error': f'Błąd podczas pobierania danych: {str(e)}'}
                 status = '500 Internal Server Error'
         else:
             response_data = {'error': 'Not found'}
